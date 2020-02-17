@@ -1,8 +1,23 @@
-# code-with-quarkus project
+# RvStore - Cars
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
 If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+
+## Setting up the containers
+
+This project comes with an docker-compose file that will start all necessary dependencies (Postgres SQL, Adminer (for sql), and Jaeger UI)
+
+In the root of the project, start the containers using
+
+```
+docker-compose -f rvstore-compose.yml up -d
+```
+
+### Services
+- Jaeger UI: http://localhost:16686
+- Adminer: http://localhost:8090
+- Postgres: http://localhost:5432 (postgres:example)
 
 ## Running the application in dev mode
 
