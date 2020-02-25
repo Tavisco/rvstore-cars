@@ -18,12 +18,13 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
 import io.quarkus.panache.common.Sort;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * CarResource
  */
-@Slf4j
+@Log
 @Path("/cars")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -31,7 +32,7 @@ public class CarResource {
 
     @GET
     public List<Car> getAllItems() {
-        log.trace("Getting all items...");
+        log.finest("Getting all items...");
         return Car.listAll(Sort.by("name"));
     }
 

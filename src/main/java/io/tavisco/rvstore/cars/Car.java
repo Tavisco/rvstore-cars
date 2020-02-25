@@ -29,9 +29,8 @@ import lombok.experimental.FieldDefaults;
 public class Car extends PanacheEntityBase {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "car_generator")
-    @SequenceGenerator(name = "car_generator", sequenceName = "cars_seq", allocationSize = 50)
-    @Column(name = "car_id", updatable = false, nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "car_id", updatable = false)
     Long id;
 
     @Column(name = "name", columnDefinition = "TEXT")
