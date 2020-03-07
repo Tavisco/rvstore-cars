@@ -15,6 +15,7 @@ import javax.persistence.Table;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Parameters;
+import io.tavisco.rvstore.common.RevoltEntity;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -26,19 +27,13 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PUBLIC)
 @NoArgsConstructor
 @Table(name = "w_cars")
-public class Car extends PanacheEntityBase {
+public class Car extends RevoltEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "car_id", updatable = false)
     Long id;
-
-    @Column(name = "name", columnDefinition = "TEXT")
-    String name;
-
-    @Column(name = "description", columnDefinition = "TEXT")
-    String description;
-
+    
     public static List<Car> findByName(String nameFind) {
         return find("name LIKE :nameFind", Parameters.with("nameFind", "%".concat(nameFind).concat("%"))).list();
     }

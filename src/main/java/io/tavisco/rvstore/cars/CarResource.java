@@ -1,6 +1,5 @@
 package io.tavisco.rvstore.cars;
 
-import java.net.URI;
 import java.security.Principal;
 import java.util.List;
 import java.util.Set;
@@ -29,7 +28,6 @@ import javax.ws.rs.core.Response.Status;
 
 import io.quarkus.panache.common.Sort;
 import lombok.extern.java.Log;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * CarResource
