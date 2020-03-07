@@ -6,6 +6,6 @@ CREATE TABLE "w_cars" (
     "description" text NOT NULL
 );
 
--- Indices -------------------------------------------------------
+-- Sequences -------------------------------------------------------
 
 CREATE SEQUENCE cars_seq;

@@ -1,10 +1,11 @@
 package io.tavisco.rvstore.common;
 
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import lombok.AccessLevel;
@@ -23,6 +24,6 @@ public abstract class RevoltEntity extends PanacheEntityBase {
     @Column(name = "description", columnDefinition = "TEXT")
     String description;
 
-
+    
     
 }
