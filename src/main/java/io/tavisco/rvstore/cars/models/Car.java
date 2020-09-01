@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -40,12 +41,12 @@ public class Car extends PanacheEntityBase {
     @Column(name = "car_id", updatable = false)
     Long id;
     
-    @NotNull
+    @NotBlank
     @Size(min = 3, max = 50)
     @Column(name = "name", columnDefinition = "TEXT")
     String name;
 
-    @NotNull
+    @NotBlank
     @Size(min = 3, max = 255)
     @Column(name = "description", columnDefinition = "TEXT")
     String description;

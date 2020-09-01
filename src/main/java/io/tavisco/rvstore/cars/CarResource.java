@@ -99,7 +99,7 @@ public class CarResource {
 
     @POST
     @RolesAllowed({ "Everyone" })
-    public Response newCar(@Context UriInfo uriInfo, @Valid Car newCar) throws IOException {
+    public Response newCar(@Context UriInfo uriInfo, @Valid Car newCar) {
         log.finest("Receive a new car");
         if (newCar.id != null) {
             return Response.status(Status.BAD_REQUEST).entity("The car ID must be null").build();
