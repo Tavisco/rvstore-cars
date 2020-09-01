@@ -11,9 +11,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Parameters;
-import io.tavisco.rvstore.common.RevoltEntity;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -25,13 +26,22 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PUBLIC)
 @NoArgsConstructor
 @Table(name = "w_cars")
-public class Car extends RevoltEntity {
+public class Car extends PanacheEntityBase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "car_id", updatable = false)
     Long id;
     
+    @Column(name = "name", columnDefinition = "TEXT")
+    String name;
+
+    @Column(name = "description", columnDefinition = "TEXT")
+    String description;
+
+    @Transient
+    private byte[] zipFile = null;
+
     @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
     Set<CarAuthor> authors;
 

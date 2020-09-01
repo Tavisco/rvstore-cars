@@ -40,7 +40,7 @@ import lombok.extern.java.Log;
  * CarResource
  */
 @Log
-@Path("/cars")
+@Path("/api/cars")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @RequestScoped
@@ -114,6 +114,13 @@ public class CarResource {
         service.persistCar(newCar);
         UriBuilder builder = uriInfo.getAbsolutePathBuilder().path(Long.toString(newCar.id));
         return Response.created(builder.build()).build();
+    }
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/hello")
+    public String hello() {
+        return "hello";
     }
     
 }
