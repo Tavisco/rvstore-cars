@@ -28,10 +28,12 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
 import io.quarkus.panache.common.Sort;
+import io.tavisco.rvstore.cars.models.Car;
 import lombok.extern.java.Log;
 
 /**
@@ -51,6 +53,9 @@ public class CarResource {
     @Claim("groups")
     private Set<String> groups;
 
+    @Inject
+    CarService service;
+
     @GET
     @Path("/auth")
     @RolesAllowed({ "Everyone" })
@@ -67,27 +72,33 @@ public class CarResource {
 
     @GET
     @PermitAll
-    public List<Car> getAllItems() {
-        log.finest("Getting all items...");
-        return Car.listAll(Sort.by("name"));
+    public Response findAllCars() {
+        List<Car> cars = service.findAllCars();
+        log.finest("Total numbers of cars: " + cars.size());
+        return Response.ok(cars).build();
     }
 
     @GET
     @PermitAll
     @Path("/search/{name}")
-    public List<Car> findByName(@PathParam String name) {
-        return Car.findByName(name);
+    public Response findByName(@PathParam String name) {
+        List<Car> cars = service.findByName(name);
+        log.finest("There are " + cars.size() + " with name '" + name + "'");
+        return Response.ok(cars).build();
     }
 
     @GET
     @PermitAll
     @Path("{id}")
-    public Car findById(@PathParam Long id) {
-        Car car = Car.findById(id);
+    public Response getCar(@PathParam Long id) {
+        Car car = service.findById(id);
         if (car == null) {
-            throw new WebApplicationException("Could not find a car with ID " + id, Status.NOT_FOUND);
+            log.finest("No car found with ID: " + id);
+            return Response.noContent().build();
         }
-        return car;
+
+        log.finest("Found car " + id);
+        return Response.ok(car).build();
     }
 
     @POST
@@ -97,13 +108,12 @@ public class CarResource {
     public Response newCar(@Context UriInfo uriInfo, @MultipartForm Car newCar) throws IOException {
         log.finest("Receive a new car");
         if (newCar.id != null) {
-            throw new WebApplicationException("Id was invalidly set on request.", Status.NOT_ACCEPTABLE);
+            return Response.status(Status.BAD_REQUEST).entity("The car ID must be null").build();
         }
 
-        // TODO: Handle the byte[]
-
-        Car.persist(newCar);
-        return Response.ok(newCar).status(Status.CREATED).build();
+        service.persistCar(newCar);
+        UriBuilder builder = uriInfo.getAbsolutePathBuilder().path(Long.toString(newCar.id));
+        return Response.created(builder.build()).build();
     }
     
 }
