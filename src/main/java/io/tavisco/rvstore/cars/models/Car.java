@@ -12,10 +12,15 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Parameters;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
@@ -26,6 +31,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PUBLIC)
 @NoArgsConstructor
 @Table(name = "w_cars")
+@AllArgsConstructor
+@Builder
 public class Car extends PanacheEntityBase {
 
     @Id
@@ -33,9 +40,13 @@ public class Car extends PanacheEntityBase {
     @Column(name = "car_id", updatable = false)
     Long id;
     
+    @NotNull
+    @Size(min = 3, max = 50)
     @Column(name = "name", columnDefinition = "TEXT")
     String name;
 
+    @NotNull
+    @Size(min = 3, max = 255)
     @Column(name = "description", columnDefinition = "TEXT")
     String description;
 
