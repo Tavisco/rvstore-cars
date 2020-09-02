@@ -6,10 +6,12 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotBlank;
@@ -54,8 +56,8 @@ public class Car extends PanacheEntityBase {
     @Transient
     private byte[] zipFile = null;
 
-    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
-    Set<CarAuthor> authors;
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER) 
+    List<CarAuthor> authors;
 
     public static List<Car> findByName(String nameFind) {
         return find("name LIKE :nameFind", Parameters.with("nameFind", "%".concat(nameFind).concat("%"))).list();
