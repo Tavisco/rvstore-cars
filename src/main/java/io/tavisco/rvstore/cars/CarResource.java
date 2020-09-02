@@ -69,8 +69,7 @@ public class CarResource {
     @GET
     @PermitAll
     public Response findAllCars() {
-        List<Car> cars = service.findAllCars();
-        log.finest("Total numbers of cars: " + cars.size());
+        Iterable<Car> cars = service.findAllCars();
         return Response.ok(cars).build();
     }
 

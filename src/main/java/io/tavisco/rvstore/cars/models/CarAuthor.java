@@ -30,16 +30,15 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @Table(name = "w_car_authors")
-public class CarAuthor extends PanacheEntityBase {
+public class CarAuthor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "author_id", updatable = false)
     Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "car_id", nullable = false)
-    @JsonbTransient
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "car_id", nullable = false, updatable = false)
     Car car;
 
     @Column(name = "name", columnDefinition = "TEXT")
