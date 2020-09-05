@@ -1,65 +1,114 @@
 package io.tavisco.rvstore.cars;
 
-import java.net.URI;
-import java.util.List;
-
-import javax.transaction.Transactional;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
+import io.tavisco.rvstore.cars.dto.CarDto;
+import io.tavisco.rvstore.cars.models.Car;
+import lombok.extern.java.Log;
+import org.eclipse.microprofile.jwt.Claim;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.Response.Status;
+import org.springframework.util.CollectionUtils;
 
-import io.quarkus.panache.common.Sort;
-import lombok.extern.slf4j.Slf4j;
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import javax.validation.Valid;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+import javax.ws.rs.core.Response.Status;
+import java.security.Principal;
+import java.util.List;
+import java.util.Set;
 
 /**
  * CarResource
  */
-@Slf4j
-@Path("/cars")
+@Log
+@Path("/api/cars")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@RequestScoped
 public class CarResource {
 
+    @Inject
+    JsonWebToken jwt;
+
+    @Inject
+    @Claim("groups")
+    Set<String> groups;
+
+    @Inject
+    CarService service;
+
     @GET
-    public List<Car> getAllItems() {
-        log.trace("Getting all items...");
-        return Car.listAll(Sort.by("name"));
+    @Path("/auth")
+    @RolesAllowed({ "Everyone" })
+    @Produces(MediaType.TEXT_PLAIN)
+    public String helloRolesAllowed(@Context SecurityContext ctx) {
+        Principal caller = ctx.getUserPrincipal();
+        String name = caller == null ? "anonymous" : caller.getName();
+        boolean hasJWT = jwt != null;
+        String groupsString = groups != null ? groups.toString() : "";
+        return String.format("hello + %s, isSecure: %s, authScheme: %s, hasJWT: %s, groups: %s\"", name,
+                ctx.isSecure(), ctx.getAuthenticationScheme(), hasJWT, groupsString);
     }
 
     @GET
+    @PermitAll
+    public Response findAllCars() {
+        Iterable<Car> cars = service.findAllCars();
+        return Response.ok(cars).build();
+    }
+
+    @GET
+    @PermitAll
     @Path("/search/{name}")
-    public List<Car> findByName(@PathParam String name) {
-        return Car.findByName(name);
+    public Response findByName(@PathParam String name) {
+        List<Car> cars = service.findByName(name);
+        log.finest("There are " + cars.size() + " with name '" + name + "'");
+        return Response.ok(cars).build();
     }
 
     @GET
-    @Path("{id}")
-    public Car findById(@PathParam Long id) {
-        Car car = Car.findById(id);
-        if (car == null) {
-            throw new WebApplicationException("Could not find a car with ID " + id, Status.NOT_FOUND);
+    @PermitAll
+    @Path("/{id}")
+    public Response getCar(@PathParam Long id) {
+        log.fine("Searching for car with ID: " + id);
+
+        if (id == null) {
+            return Response.status(Status.BAD_REQUEST).entity("You should especify an ID to look up").build();
         }
-        return car;
+
+        Car car = service.findById(id);
+        if (car == null) {
+            log.finest("No car found with ID: " + id);
+            return Response.noContent().build();
+        }
+
+        log.finest("Found car " + id);
+        return Response.ok(car).build();
     }
 
+
+    @RolesAllowed({ "Everyone" })
     @POST
-    @Transactional
-    public Response newCar(@Context UriInfo uriInfo, Car newCar) {
-        if (newCar.id != null) {
-            throw new WebApplicationException("Id was invalidly set on request.", Status.NOT_ACCEPTABLE);
+    public Response newCar(@Context UriInfo uriInfo, @Valid CarDto carDto) {
+        log.finest("Receive a new car");
+
+        if (CollectionUtils.isEmpty(carDto.getAuthors())) {
+            return Response.status(Status.BAD_REQUEST).entity("The car should have at least one author").build();
         }
 
-        Car.persist(newCar);
-        return Response.ok(newCar).status(Status.CREATED).build();
+        Car savedCar = service.persistCar(new Car(carDto));
+        UriBuilder builder = uriInfo.getAbsolutePathBuilder().path(Long.toString(savedCar.id));
+        return Response.created(builder.build()).build();
+    }
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/hello")
+    public String hello() {
+        return "hello";
     }
     
 }
