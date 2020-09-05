@@ -5,6 +5,8 @@ on:
     branches-ignore:
       - 'master'
       - 'release*'
+  pull_request:
+    types: [ opened, synchronize, reopened ]
 
 jobs:
 
