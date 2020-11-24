@@ -1,5 +1,6 @@
 package io.tavisco.rvstore.cars.models;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -24,12 +25,16 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Parameters;
 import io.tavisco.rvstore.cars.dto.CarAuthorDto;
 import io.tavisco.rvstore.cars.dto.CarDto;
+import io.tavisco.rvstore.cars.enums.JwtCustomClaims;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.eclipse.microprofile.jwt.JsonWebToken;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 /**
  * Car
@@ -46,23 +51,40 @@ public class Car {
     @Column(name = "car_id", nullable = false, updatable = false)
     Long id;
 
+    //@NotBlank
     @Column(name = "name", columnDefinition = "TEXT")
     String name;
 
+    //@NotBlank
     @Column(name = "description", columnDefinition = "TEXT")
     String description;
 
-    @Transient
-    private byte[] zipFile = null;
+    //@NotBlank
+    @Column(name = "uploader_id", columnDefinition = "TEXT")
+    String uploaderId;
+
+    //@NotBlank
+    @Column(name = "uploader_name", columnDefinition = "TEXT")
+    String uploaderName;
+
+    @Column(name = "create_date")
+    @CreationTimestamp
+    LocalDateTime createDate;
+
+    @Column(name = "update_date")
+    @UpdateTimestamp
+    LocalDateTime updateDate;
 
     @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     List<CarAuthor> authors;
 
-    public Car(CarDto carDto) {
+    public Car(CarDto carDto, JsonWebToken jwt) {
         this.name = carDto.getName();
         this.description = carDto.getDescription();
         this.authors = carDto.getAuthors().stream()
                                             .map(dto -> new CarAuthor(dto, this))
                                             .collect(Collectors.toList());
+        this.uploaderId = jwt.getClaim(JwtCustomClaims.UID.getText());
+        this.uploaderName = jwt.getClaim(JwtCustomClaims.NICKNAME.getText());
     }
 }
