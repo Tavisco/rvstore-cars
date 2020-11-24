@@ -6,17 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -25,6 +15,7 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Parameters;
 import io.tavisco.rvstore.cars.dto.CarAuthorDto;
 import io.tavisco.rvstore.cars.dto.CarDto;
+import io.tavisco.rvstore.cars.enums.CarStep;
 import io.tavisco.rvstore.cars.enums.JwtCustomClaims;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -51,21 +42,21 @@ public class Car {
     @Column(name = "car_id", nullable = false, updatable = false)
     Long id;
 
-    //@NotBlank
     @Column(name = "name", columnDefinition = "TEXT")
     String name;
 
-    //@NotBlank
     @Column(name = "description", columnDefinition = "TEXT")
     String description;
 
-    //@NotBlank
     @Column(name = "uploader_id", columnDefinition = "TEXT")
     String uploaderId;
 
-    //@NotBlank
     @Column(name = "uploader_name", columnDefinition = "TEXT")
     String uploaderName;
+
+    @Convert(converter = CarStep.Mapper.class)
+    @Column(name = "car_step", columnDefinition = "TEXT")
+    CarStep step;
 
     @Column(name = "create_date")
     @CreationTimestamp
@@ -81,6 +72,7 @@ public class Car {
     public Car(CarDto carDto, JsonWebToken jwt) {
         this.name = carDto.getName();
         this.description = carDto.getDescription();
+        this.step = carDto.getStep();
         this.authors = carDto.getAuthors().stream()
                                             .map(dto -> new CarAuthor(dto, this))
                                             .collect(Collectors.toList());

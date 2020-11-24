@@ -4,6 +4,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.common.mapper.TypeRef;
 import io.tavisco.rvstore.cars.dto.CarAuthorDto;
 import io.tavisco.rvstore.cars.dto.CarDto;
+import io.tavisco.rvstore.cars.enums.CarStep;
 import io.tavisco.rvstore.cars.models.Car;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -149,7 +150,7 @@ class CarResourceTest {
         CarDto car = CarDto.builder()
                 .name(DEFAULT_NAME)
                 .description(DEFAULT_DESCRIPTION)
-
+                .step(CarStep.PENDING_UPLOAD)
                 .authors(authors)
                 .build();
 

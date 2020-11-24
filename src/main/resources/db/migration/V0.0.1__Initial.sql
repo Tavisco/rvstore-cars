@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS "rvstore_cars"."w_cars" (
       "car_id" INT NOT NULL PRIMARY KEY,
       "name" VARCHAR(255) NOT NULL,
       "description" VARCHAR(255) NOT NULL,
+      "car_step" VARCHAR(50) NOT NULL,
       "uploader_id" VARCHAR(255) NOT NULL,
       "uploader_name" VARCHAR(255) NOT NULL,
       "create_date" TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW() NOT NULL,
