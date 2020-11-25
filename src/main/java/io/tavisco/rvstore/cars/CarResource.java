@@ -3,7 +3,6 @@ package io.tavisco.rvstore.cars;
 import io.tavisco.rvstore.cars.dto.CarDto;
 import io.tavisco.rvstore.cars.models.Car;
 import lombok.extern.java.Log;
-import org.eclipse.microprofile.jwt.Claim;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 import org.springframework.util.CollectionUtils;
@@ -16,9 +15,7 @@ import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
-import java.security.Principal;
 import java.util.List;
-import java.util.Set;
 
 /**
  * CarResource
@@ -34,24 +31,7 @@ public class CarResource {
     JsonWebToken jwt;
 
     @Inject
-    @Claim("groups")
-    Set<String> groups;
-
-    @Inject
     CarService service;
-
-    @GET
-    @Path("/auth")
-    @RolesAllowed({ "Everyone" })
-    @Produces(MediaType.TEXT_PLAIN)
-    public String helloRolesAllowed(@Context SecurityContext ctx) {
-        Principal caller = ctx.getUserPrincipal();
-        String name = caller == null ? "anonymous" : caller.getName();
-        boolean hasJWT = jwt != null;
-        String groupsString = groups != null ? groups.toString() : "";
-        return String.format("hello + %s, isSecure: %s, authScheme: %s, hasJWT: %s, groups: %s\"", name,
-                ctx.isSecure(), ctx.getAuthenticationScheme(), hasJWT, groupsString);
-    }
 
     @GET
     @PermitAll
@@ -63,7 +43,7 @@ public class CarResource {
     @GET
     @PermitAll
     @Path("/search/{name}")
-    public Response findByName(@PathParam String name) {
+    public Response findByName(@PathParam("name") String name) {
         List<Car> cars = service.findByName(name);
         log.finest("There are " + cars.size() + " with name '" + name + "'");
         return Response.ok(cars).build();
@@ -72,20 +52,16 @@ public class CarResource {
     @GET
     @PermitAll
     @Path("/{id}")
-    public Response getCar(@PathParam Long id) {
-        log.fine("Searching for car with ID: " + id);
-
-        if (id == null) {
-            return Response.status(Status.BAD_REQUEST).entity("You should especify an ID to look up").build();
-        }
+    public Response getCar(@PathParam("id") Long id) {
+        log.info("Searching for car with ID: " + id);
 
         Car car = service.findById(id);
         if (car == null) {
-            log.finest("No car found with ID: " + id);
+            log.info("No car found with ID: " + id);
             return Response.noContent().build();
         }
 
-        log.finest("Found car " + id);
+        log.info("Found car " + id);
         return Response.ok(car).build();
     }
 
@@ -99,7 +75,7 @@ public class CarResource {
             return Response.status(Status.BAD_REQUEST).entity("The car should have at least one author").build();
         }
 
-        Car savedCar = service.persistCar(new Car(carDto));
+        Car savedCar = service.persistCar(new Car(carDto, jwt));
         UriBuilder builder = uriInfo.getAbsolutePathBuilder().path(Long.toString(savedCar.id));
         return Response.created(builder.build()).build();
     }
