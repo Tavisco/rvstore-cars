@@ -74,7 +74,7 @@ public class Car {
         this.description = carDto.getDescription();
         this.step = carDto.getStep();
         this.authors = carDto.getAuthors().stream()
-                                            .map(dto -> new CarAuthor(dto, this))
+                                            .map(carAuthorDto -> new CarAuthor(carAuthorDto, this))
                                             .collect(Collectors.toList());
         this.uploaderId = jwt.getClaim(JwtCustomClaims.UID.getText());
         this.uploaderName = jwt.getClaim(JwtCustomClaims.NICKNAME.getText());

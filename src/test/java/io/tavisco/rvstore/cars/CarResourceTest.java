@@ -6,10 +6,7 @@ import io.tavisco.rvstore.cars.dto.CarAuthorDto;
 import io.tavisco.rvstore.cars.dto.CarDto;
 import io.tavisco.rvstore.cars.enums.CarStep;
 import io.tavisco.rvstore.cars.models.Car;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.ArrayList;
@@ -27,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
 @QuarkusTest
+@Tag("integration")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class CarResourceTest {
 

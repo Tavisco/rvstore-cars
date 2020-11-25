@@ -1,12 +1,14 @@
 package io.tavisco.rvstore.cars;
 
 import io.quarkus.test.junit.QuarkusTest;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
 import static io.tavisco.rvstore.cars.TokenUtils.generateValidUserToken;
 import static org.hamcrest.CoreMatchers.is;
 
+@Tag("integration")
 @QuarkusTest
 class DebugResourceTest {
 
