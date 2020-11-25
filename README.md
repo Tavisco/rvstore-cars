@@ -1,6 +1,6 @@
 # RvStore - Cars
 
-[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Tavisco_rvstore-cars&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=Tavisco_rvstore-cars) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Tavisco_rvstore-cars&metric=coverage)](https://sonarcloud.io/dashboard?id=Tavisco_rvstore-cars) [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=Tavisco_rvstore-cars&metric=ncloc)](https://sonarcloud.io/dashboard?id=Tavisco_rvstore-cars)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Tavisco_rvstore-cars&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=Tavisco_rvstore-cars) [![codecov](https://codecov.io/gh/Tavisco/rvstore-cars/branch/master/graph/badge.svg?token=M3PPPIVDDO)](https://codecov.io/gh/Tavisco/rvstore-cars) [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=Tavisco_rvstore-cars&metric=ncloc)](https://sonarcloud.io/dashboard?id=Tavisco_rvstore-cars)
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
