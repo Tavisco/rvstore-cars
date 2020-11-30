@@ -1,20 +1,17 @@
 package io.tavisco.rvstore.cars.models;
 
-import io.tavisco.rvstore.cars.dto.CarAuthorDto;
 import io.tavisco.rvstore.cars.dto.CarDto;
 import io.tavisco.rvstore.cars.enums.CarStep;
 import io.tavisco.rvstore.cars.enums.JwtCustomClaims;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.junit.jupiter.api.Test;
 
-import static org.mockito.Mockito.*;
-
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class CarTest {
 

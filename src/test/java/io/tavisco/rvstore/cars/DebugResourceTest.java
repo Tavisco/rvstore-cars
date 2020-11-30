@@ -19,7 +19,7 @@ class DebugResourceTest {
                 .get("/api/debug/auth")
             .then()
                 .statusCode(200)
-                .body(is("hello + anonymous, isSecure: false, authScheme: null, hasJWT: true, uid: null, nickname: null groups: "));
+                .body(is("hello + anonymous, isSecure: false, authScheme: null, uid: null, nickname: null groups: "));
     }
 
     @Test
@@ -30,7 +30,7 @@ class DebugResourceTest {
                 .get("/api/debug/auth")
             .then()
                 .statusCode(200)
-                .body(is("hello + jdoe@quarkus.io, isSecure: false, authScheme: Bearer, hasJWT: true, uid: 123UID, nickname: Nickname groups: [Everyone]"));
+                .body(is("hello + jdoe@quarkus.io, isSecure: false, authScheme: Bearer, uid: 123UID, nickname: Nickname groups: [Everyone]"));
     }
 
 }
