@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
-import static io.tavisco.rvstore.cars.TokenUtils.generateValidUserToken;
+import static io.tavisco.rvstore.cars.TokenUtils.generateValidPrimaryUserToken;
 import static org.hamcrest.CoreMatchers.is;
 
 @Tag("integration")
@@ -25,12 +25,12 @@ class DebugResourceTest {
     @Test
     void testAuthEndpointWithAuthorization() {
         given()
-            .auth().oauth2(generateValidUserToken())
+            .auth().oauth2(generateValidPrimaryUserToken())
             .when()
                 .get("/api/debug/auth")
             .then()
                 .statusCode(200)
-                .body(is("hello + jdoe@quarkus.io, isSecure: false, authScheme: Bearer, uid: 123UID, nickname: Nickname groups: [Everyone]"));
+                .body(is("hello + primary@quarkus.io, isSecure: false, authScheme: Bearer, uid: 123UID, nickname: Nickname groups: [Everyone]"));
     }
 
 }

@@ -5,8 +5,11 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
+import io.tavisco.rvstore.cars.enums.JwtCustomClaims;
 import io.tavisco.rvstore.cars.models.Car;
 import io.tavisco.rvstore.cars.repository.CarRepository;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import static javax.transaction.Transactional.TxType.REQUIRED;
 import static javax.transaction.Transactional.TxType.SUPPORTS;
@@ -32,6 +35,14 @@ public class CarService {
 
     public Car findById(Long id) {
         return repository.findById(id).orElse(null);
+    }
+
+    public List<Car> findByUser(JsonWebToken jwt) {
+        if (jwt == null || StringUtils.isBlank(jwt.getClaim(JwtCustomClaims.UID.getText()))) {
+            throw new RuntimeException("Null or invalid JWT!");
+        }
+
+        return repository.findByUploaderId(jwt.getClaim(JwtCustomClaims.UID.getText()));
     }
 
     public Car persistCar(@Valid Car car) {
