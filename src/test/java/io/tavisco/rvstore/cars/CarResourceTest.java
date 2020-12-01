@@ -108,6 +108,7 @@ class CarResourceTest {
         CarDto invalidCar = CarDto.builder()
                 .name(DEFAULT_NAME)
                 .description(DEFAULT_DESCRIPTION)
+                .step(CarStep.PENDING_UPLOAD)
                 .authors(null)
                 .build();
 
@@ -119,7 +120,8 @@ class CarResourceTest {
             .when()
                 .post("/api/cars")
             .then()
-                .statusCode(BAD_REQUEST.getStatusCode());
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .body(is("The car should have at least one author"));
     }
 
     @Test

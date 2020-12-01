@@ -69,9 +69,10 @@ public class CarResource {
     @RolesAllowed({ "Everyone" })
     @POST
     public Response newCar(@Context UriInfo uriInfo, @Valid CarDto carDto) {
-        log.finest("Receive a new car");
+        log.info("Receive a new car");
 
         if (CollectionUtils.isEmpty(carDto.getAuthors())) {
+            log.info("Received a car without any authors!");
             return Response.status(Status.BAD_REQUEST).entity("The car should have at least one author").build();
         }
 

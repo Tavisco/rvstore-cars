@@ -41,10 +41,9 @@ public class DebugResource {
         String name = caller == null ? "anonymous" : caller.getName();
         String uid = jwt.getClaim("uid");
         String nickname = jwt.getClaim("nickname");
-        boolean hasJWT = jwt != null;
         String groupsString = groups != null ? groups.toString() : "";
-        return String.format("hello + %s, isSecure: %s, authScheme: %s, hasJWT: %s, uid: %s, nickname: %s groups: %s", name,
-                ctx.isSecure(), ctx.getAuthenticationScheme(), hasJWT, uid, nickname, groupsString);
+        return String.format("hello + %s, isSecure: %s, authScheme: %s, uid: %s, nickname: %s groups: %s", name,
+                ctx.isSecure(), ctx.getAuthenticationScheme(), uid, nickname, groupsString);
     }
 
 }
