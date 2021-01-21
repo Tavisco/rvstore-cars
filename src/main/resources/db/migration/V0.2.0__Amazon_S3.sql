@@ -1,0 +1,1 @@
+ALTER TABLE "rvstore_cars"."w_cars" ADD COLUMN "upload_object_key" VARCHAR(1024);

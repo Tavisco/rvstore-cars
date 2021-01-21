@@ -14,7 +14,8 @@ import java.util.List;
 
 import static io.restassured.RestAssured.get;
 import static io.restassured.RestAssured.given;
-import static io.tavisco.rvstore.cars.TokenUtils.generateValidUserToken;
+import static io.tavisco.rvstore.cars.TokenUtils.generateValidPrimaryUserToken;
+import static io.tavisco.rvstore.cars.TokenUtils.generateValidSecondaryUserToken;
 import static javax.ws.rs.core.HttpHeaders.ACCEPT;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -36,16 +37,6 @@ class CarResourceTest {
     private static final Integer INITIAL_CARS_QTY = 0;
 
     private static String carId;
-
-    @Test
-    void testHelloEndpoint() {
-        given()
-            .when()
-                .get("/api/cars/hello")
-            .then()
-                .statusCode(200)
-                .body(is("hello"));
-    }
 
     @Test
     void shouldNotGetUnknownCar() {
@@ -93,7 +84,7 @@ class CarResourceTest {
                 .build();
 
         given()
-            .auth().oauth2(generateValidUserToken())
+            .auth().oauth2(generateValidPrimaryUserToken())
             .body(invalidCar)
             .header(CONTENT_TYPE, APPLICATION_JSON)
             .header(ACCEPT, APPLICATION_JSON)
@@ -113,7 +104,7 @@ class CarResourceTest {
                 .build();
 
         given()
-            .auth().oauth2(generateValidUserToken())
+            .auth().oauth2(generateValidPrimaryUserToken())
             .body(invalidCar)
             .header(CONTENT_TYPE, APPLICATION_JSON)
             .header(ACCEPT, APPLICATION_JSON)
@@ -155,7 +146,7 @@ class CarResourceTest {
                 .build();
 
         String location = given()
-                .auth().oauth2(generateValidUserToken())
+                .auth().oauth2(generateValidPrimaryUserToken())
                 .body(car)
                 .header(CONTENT_TYPE, APPLICATION_JSON)
                 .header(ACCEPT, APPLICATION_JSON)
@@ -218,6 +209,38 @@ class CarResourceTest {
                 .body("[0].authors.size()", is(2))
                 .body("[0].authors[0].name", is(DEFAULT_AUTHOR1_NAME))
                 .body("[0].authors[1].name", is(DEFAULT_AUTHOR2_NAME));
+    }
+
+    @Test
+    @Order(5)
+    void shouldRetrieveCreatedCarByToken() {
+
+        given()
+                .header(ACCEPT, APPLICATION_JSON)
+                .auth().oauth2(generateValidPrimaryUserToken()) // PRIMARY TOKEN
+            .when()
+                .get("/api/cars/my")
+            .then()
+                .statusCode(OK.getStatusCode())
+                .header(CONTENT_TYPE, APPLICATION_JSON)
+                .body("[0].name", is(DEFAULT_NAME))
+                .body("[0].description", is(DEFAULT_DESCRIPTION))
+                .body("[0].authors.size()", is(2))
+                .body("[0].authors[0].name", is(DEFAULT_AUTHOR1_NAME))
+                .body("[0].authors[1].name", is(DEFAULT_AUTHOR2_NAME));
+    }
+
+    @Test
+    @Order(6)
+    void shouldNotRetrieveCreatedCarByTokenToSecondaryUser() {
+
+        given()
+                .header(ACCEPT, APPLICATION_JSON)
+                .auth().oauth2(generateValidSecondaryUserToken()) // SECONDARY TOKEN
+            .when()
+                .get("/api/cars/my")
+            .then()
+                .statusCode(NO_CONTENT.getStatusCode());
     }
 
     private TypeRef<List<Car>> getCarTypeRef() {
