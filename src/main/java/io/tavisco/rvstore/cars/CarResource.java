@@ -2,9 +2,12 @@ package io.tavisco.rvstore.cars;
 
 import io.tavisco.rvstore.cars.dto.CarDto;
 import io.tavisco.rvstore.cars.dto.FormData;
+import io.tavisco.rvstore.cars.exceptions.CarNotFoundException;
 import io.tavisco.rvstore.cars.models.Car;
 import io.tavisco.rvstore.cars.s3.CommonResource;
+import io.tavisco.rvstore.cars.s3.FileObject;
 import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
@@ -29,7 +32,7 @@ import java.util.List;
 /**
  * CarResource
  */
-@Log
+@Slf4j
 @Path("/api/cars")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -44,12 +47,6 @@ public class CarResource {
     @Inject
     CarService service;
 
-    @Inject
-    S3Client s3;
-
-    @Inject
-    CommonResource commonResource;
-
     @GET
     @PermitAll
     public Response findAllCars() {
@@ -62,7 +59,7 @@ public class CarResource {
     @Path("/search/{name}")
     public Response findByName(@PathParam("name") String name) {
         List<Car> cars = service.findByName(name);
-        log.finest("There are " + cars.size() + " with name '" + name + "'");
+        log.debug("There are " + cars.size() + " with name '" + name + "'");
         return Response.ok(cars).build();
     }
 
@@ -116,10 +113,11 @@ public class CarResource {
 
 
     @POST
+    @RolesAllowed({ "Everyone" })
     @Path("/{id}/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response uploadFile(@MultipartForm FormData formData) {
-
+    public Response uploadFile(@MultipartForm FormData formData, @PathParam("id") Long id) {
+        log.debug("Uploading file for car ID " + id);
         if (formData.fileName == null || formData.fileName.isEmpty()) {
             return Response.status(Status.BAD_REQUEST).build();
         }
@@ -128,26 +126,32 @@ public class CarResource {
             return Response.status(Status.BAD_REQUEST).build();
         }
 
-        PutObjectResponse putResponse = s3.putObject(commonResource.buildPutRequest(formData),
-                RequestBody.fromFile(commonResource.uploadToTemp(formData.data)));
-        if (putResponse != null) {
-            return Response.ok().status(Status.CREATED).build();
-        } else {
-            return Response.serverError().build();
+        if (service.findById(id) == null) {
+            return Response.status(Status.BAD_REQUEST).build();
         }
+
+        try {
+            Car car = service.persistUploadInfo(formData, id, jwt);
+            if (car != null) {
+                return Response.ok().status(Status.CREATED).build();
+            }
+        } catch (Exception e) {
+            log.info("Error while upload car.", e);
+        }
+        return Response.serverError().build();
     }
 
     @GET
     @Path("download/{objectKey}")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response downloadFile(@PathParam("objectKey") String objectKey) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        GetObjectResponse object = s3.getObject(commonResource.buildGetRequest(objectKey), ResponseTransformer.toOutputStream(baos));
+        return service.downloadCarFile(objectKey);
+    }
 
-        Response.ResponseBuilder response = Response.ok((StreamingOutput) baos::writeTo);
-        response.header("Content-Disposition", "attachment;filename=" + objectKey);
-        response.header("Content-Type", object.contentType());
-        return response.build();
+    @GET
+    @Path("download/list")
+    public List<FileObject> listFiles() {
+        return service.listFiles();
     }
 
 }

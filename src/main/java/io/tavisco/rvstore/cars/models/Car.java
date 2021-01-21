@@ -57,6 +57,9 @@ public class Car {
     @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     List<CarAuthor> authors;
 
+    @Column(name = "upload_object_key", columnDefinition = "TEXT")
+    String uploadObjectKey;
+
     public Car(CarDto carDto, JsonWebToken jwt) {
         this.name = carDto.getName();
         this.description = carDto.getDescription();

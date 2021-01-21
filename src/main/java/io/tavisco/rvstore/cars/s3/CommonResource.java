@@ -22,10 +22,11 @@ public class CommonResource {
     @ConfigProperty(name = "bucket.name")
     String bucketName;
 
-    public PutObjectRequest buildPutRequest(final FormData formData) {
+    public PutObjectRequest buildPutRequest(final FormData formData, final String userUid) {
+        String fileUuid = UUID.randomUUID().toString().substring(0, 8);
         return PutObjectRequest.builder()
                 .bucket(bucketName)
-                .key(formData.fileName)
+                .key(String.format("%s-%s-%s", userUid, fileUuid, formData.fileName))
                 .contentType(formData.mimeType)
                 .build();
     }
@@ -56,5 +57,9 @@ public class CommonResource {
         }
 
         return tempPath;
+    }
+
+    public String getBucketName() {
+        return bucketName;
     }
 }
