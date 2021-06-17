@@ -68,7 +68,7 @@ jobs:
       - name: Build native with Maven
         run: mvn -B package -Pnative -Dquarkus.native.container-build=true -DskipTests
       - name: Upload target for next job
-        uses: actions/upload-artifact@v2.2.1
+        uses: actions/upload-artifact@v2.2.4
         with:
           name: target
           path: target
